@@ -40,8 +40,8 @@ jobs:
     - name: Install Parakeet SDK
       # Build your program with the given configuration
       run: 
-        cd build 
-        make install
+        cd build &&
+        make install &&
         cd ../../
         
     - name: Configure CMake for Parakeet Qt
