@@ -38,7 +38,10 @@ jobs:
 
     - name: Build for Parakeet SDK
       # Build your program with the given configuration
-      run: cmake --build parakeet-sdk/build --config ${{env.BUILD_TYPE}}
+      run: 
+        cmake --build parakeet-sdk/build --config ${{env.BUILD_TYPE}} &&
+        cd parakeet-sdk/build &&
+        make install
         
     - name: Clone Parkeet Qt
       uses: actions/checkout@v2
@@ -52,9 +55,8 @@ jobs:
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run:
         cd parakeet-qt &&
-        cmake -B ${{github.workspace}}/parakeet-qt/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DParakeet_DIR=${{github.workspace}}/parakeet-sdk/install &&
-        cd build &&
-        make install
+          cmake -B ${{github.workspace}}/parakeet-qt/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DParakeet_DIR=${{github.workspace}}/parakeet-sdk/install &&
+          cd build
 
     - name: Build for Parakeet Qt
       # Build your program with the given configuration
