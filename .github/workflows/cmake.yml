@@ -24,7 +24,7 @@ jobs:
       with:
         repository: 'BryceVichiOJ/parakeet-sdk'
         path: 'parakeet-sdk'
-        token: ${{ secrets.Parakeet_PAT }}
+        token: ${{ secrets.Parakeet_PAT || github.token }}
         
     - name: Configure CMake for Parakeet SDK
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
