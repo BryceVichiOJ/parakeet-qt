@@ -39,7 +39,7 @@ jobs:
     - name: Build for Parakeet SDK
       # Build your program with the given configuration
       run: 
-        cmake --build parakeet-sdk/build --config ${{env.BUILD_TYPE}} --install ${{github.workspace}}/parakeet-sdk/install &&
+        cmake --build parakeet-sdk/build --config ${{env.BUILD_TYPE}} --target install &&
         cd parakeet-sdk/build
         
     - name: Clone Parkeet Qt
