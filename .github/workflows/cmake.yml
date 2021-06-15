@@ -22,7 +22,7 @@ jobs:
     - name: Clone Parkeet SDK
       uses: actions/checkout@v2
       with:
-        repository: 'MechaSpin/parakeet-sdk'
+        repository: 'BryceVichiOJ/parakeet-sdk'
         path: 'parakeet-sdk'
         token: ${{ secrets.Parakeet_PAT }}
         
