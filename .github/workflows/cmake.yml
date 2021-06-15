@@ -40,7 +40,7 @@ jobs:
     - name: Install Parakeet SDK
       # Build your program with the given configuration
       run: 
-        cd build &&
+        cd parakeet-sdk/build &&
         make install &&
         cd ../../
         
