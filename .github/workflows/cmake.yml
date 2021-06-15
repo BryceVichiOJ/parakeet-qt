@@ -55,7 +55,7 @@ jobs:
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run:
         cd parakeet-qt &&
-          cmake -B ${{github.workspace}}/parakeet-qt/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DParakeet_DIR=${{github.workspace}}/parakeet-sdk/install &&
+          cmake -B ${{github.workspace}}/parakeet-qt/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_PREFIX_PATH=${{github.workspace}}/parakeet-sdk/install &&
           cd build
 
     - name: Build for Parakeet Qt
