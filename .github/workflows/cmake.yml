@@ -20,13 +20,35 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Clone Parkeet SDK
+      uses: actions/checkout@v2
+      with:
+        repository: 'MechaSpin/parakeet-sdk'
+        path: 'parakeet-sdk'
+        token: ${{ secrets.Parakeet_PAT }}
+        
+    - name: Configure CMake for Parakeet SDK
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      run: cmake -B parakeet-sdk/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
-    - name: Configure CMake
+    - name: Build for Parakeet SDK
+      # Build your program with the given configuration
+      run: cmake --build parakeet-sdk/build --config ${{env.BUILD_TYPE}}
+      
+    - name: Install Parakeet SDK
+      # Build your program with the given configuration
+      run: 
+        cd parakeet-sdk/build 
+        make install
+        cd ../../
+        
+    - name: Configure CMake for Parakeet Qt
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
-    - name: Build
+    - name: Build for Parakeet Qt
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
