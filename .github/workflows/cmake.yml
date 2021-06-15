@@ -34,14 +34,13 @@ jobs:
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: 
         cd parakeet-sdk &&
-        cmake -B ${{github.workspace}}/parakeet-sdk/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/parakeet-sdk/install
+        cmake -B ${{github.workspace}}/parakeet-sdk/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
     - name: Build for Parakeet SDK
       # Build your program with the given configuration
       run: 
-        cmake --build parakeet-sdk/build --config ${{env.BUILD_TYPE}} &&
-        cd parakeet-sdk/build &&
-        make install
+        cmake --build parakeet-sdk/build --config ${{env.BUILD_TYPE}} --install ${{github.workspace}}/parakeet-sdk/install &&
+        cd parakeet-sdk/build
         
     - name: Clone Parkeet Qt
       uses: actions/checkout@v2
