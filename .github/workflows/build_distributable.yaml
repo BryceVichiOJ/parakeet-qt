@@ -7,8 +7,10 @@ on:
     branches: [ main ]
 
 env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
+  PARAKEET_SDK_REPO: 'BryceVichiOJ/parakeet-sdk'
+  PARAKEET_QT_REPO: 'BryceVichiOJ/parakeet-qt'
+  PERSONAL_ACCESS_TOKEN: ${{ secrets.Parakeet_PART }}
 
 jobs:
  build:
@@ -25,9 +27,9 @@ jobs:
       - name: Clone Parkeet SDK
         uses: actions/checkout@v2
         with:
-          repository: 'BryceVichiOJ/parakeet-sdk'
+          repository: ${{ env.PARAKEET_SDK_REPO }}
           path: 'parakeet-sdk'
-          token: ${{ secrets.Parakeet_PAT || github.token }}
+          token: ${{ env.PERSONAL_ACCESS_TOKEN || github.token }}
 
       - name: Configure CMake for Parakeet SDK
         run: 
@@ -42,9 +44,9 @@ jobs:
       - name: Clone Parkeet Qt
         uses: actions/checkout@v2
         with:
-          repository: 'BryceVichiOJ/parakeet-qt'
+          repository: ${{ env.PARAKEET_QT_REPO }}
           path: 'parakeet-qt'
-          token: ${{ secrets.Parakeet_PAT || github.token }}
+          token: ${{ env.PERSONAL_ACCESS_TOKEN || github.token }}
 
       - name: Configure CMake for Parakeet Qt
         run:
