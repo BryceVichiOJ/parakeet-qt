@@ -1,4 +1,4 @@
-name: Build-Distributable-Linux
+name: Build-Distributable-Windows
 
 on:
   push:
