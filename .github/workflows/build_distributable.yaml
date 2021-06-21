@@ -65,7 +65,7 @@ jobs:
             echo ${{ steps.getversion.outputs.version }}
       - name: Create Release
           uses: actions/checkout@v1
-            - uses: ncipollo/release-action@v1
+          uses: ncipollo/release-action@v1
               with:
                 allowsUpdates: true
                 artifacts: "CMakeVersion"
