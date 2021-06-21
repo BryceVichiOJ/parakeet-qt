@@ -63,10 +63,6 @@ jobs:
       - name: Build for Parakeet Qt
         run: cmake --build ${{github.workspace}}/parakeet-qt/build --config ${{env.BUILD_TYPE}}
         
-      - name: Check CMake Version changed2
-        run:
-            cat parakeet-qt/CMakeLists.txt | grep project\(.*VERSION.*\)
-            
       - name: Check CMake Version changed
         run:
             cat parakeet-qt/CMakeLists.txt | grep project\(.*VERSION.*\) | sed 's/ DESCRIPTION.*//' | sed 's/.*VERSION //' > stagingCMakeVersion &&
@@ -75,4 +71,4 @@ jobs:
             
       - name: Check CHANGELOG is different
         run:         
-            cmp --silent parakeet-qt/CHANGELOG.txt parakeet-qt-main/CHANGELOG.md
+            cmp --silent parakeet-qt/CHANGELOG.md parakeet-qt-main/CHANGELOG.md
