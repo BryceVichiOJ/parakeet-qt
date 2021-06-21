@@ -60,7 +60,7 @@ jobs:
       - name: Get New Parakeet Qt Release Version
         id: getversion
         run:             
-            sh "cat parakeet-qt/CMakeLists.txt | grep project\\(.*VERSION.*\\) | sed 's/ DESCRIPTION.*//' | sed 's/.*VERSION //' > CMakeVersion;"
+            cat parakeet-qt/CMakeLists.txt | grep project\\(.*VERSION.*\\) | sed 's/ DESCRIPTION.*//' | sed 's/.*VERSION //' > CMakeVersion
             echo "::set-output name=version::$(cat CMakeVersion)"
             echo ${{ steps.getversion.outputs.version }}
       - name: Create Release
