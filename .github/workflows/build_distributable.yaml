@@ -54,6 +54,20 @@ jobs:
             cd build
 
       - name: Build for Parakeet Qt
-        run: cmake --build ${{github.workspace}}/parakeet-qt/build --config ${{env.BUILD_TYPE}}
-      
-  # CREATE DISTRIBUATABLE AND UPLOAD IT
+        run: 
+            cmake --build ${{github.workspace}}/parakeet-qt/build --config ${{env.BUILD_TYPE}}
+        
+      - name: Get New Parakeet Qt Release Version
+        id: getversion
+        run:             
+            sh "cat parakeet-qt/CMakeLists.txt | grep project\\(.*VERSION.*\\) | sed 's/ DESCRIPTION.*//' | sed 's/.*VERSION //' > CMakeVersion;"
+            echo "::set-output name=version::$(cat CMakeVersion)"
+            echo ${{ steps.getversion.outputs.version }}
+      - name: Create Release
+          - uses: actions/checkout@v1
+            - uses: ncipollo/release-action@v1
+              with:
+                allowsUpdates: true
+                artifacts: "CMakeVersion"
+                tag: v${{ steps.getversion.outputs.version }}
+                token: ${{ secrets.GITHUB_TOKEN }}

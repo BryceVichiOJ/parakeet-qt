@@ -46,6 +46,13 @@ jobs:
           repository: ${{ env.PARAKEET_QT_REPO }}
           path: 'parakeet-qt'
           token: ${{ env.PERSONAL_ACCESS_TOKEN || github.token }}
+          
+      - name: Clone Parkeet Qt Main Branch
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.PARAKEET_QT_REPO }}
+          path: 'parakeet-qt-main'
+          token: ${{ env.PERSONAL_ACCESS_TOKEN || github.token }}
 
       - name: Configure CMake for Parakeet Qt
         run:
@@ -55,3 +62,13 @@ jobs:
 
       - name: Build for Parakeet Qt
         run: cmake --build ${{github.workspace}}/parakeet-qt/build --config ${{env.BUILD_TYPE}}
+        
+      - name: Check CMake Version changed
+        run:         
+            sh "cat parakeet-qt/CMakeLists.txt | grep project\\(.*VERSION.*\\) | sed 's/ DESCRIPTION.*//' | sed 's/.*VERSION //' > stagingCMakeVersion;"
+            sh "cat parakeet-qt-main/CMakeLists.txt | grep project\\(.*VERSION.*\\) | sed 's/ DESCRIPTION.*//' | sed 's/.*VERSION //' > mainCMakeVersion;"
+            cmp --silent stagingCMakeVersion mainCMakeVersion
+            
+      - name: Check CHANGELOG is different
+        run:         
+            cmp --silent parakeet-qt/CHANGELOG.txt parakeet-qt-main/CHANGELOG.md
