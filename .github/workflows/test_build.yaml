@@ -67,8 +67,8 @@ jobs:
         run:
             cat parakeet-qt/CMakeLists.txt | grep project\(.*VERSION.*\) | sed 's/ DESCRIPTION.*//' | sed 's/.*VERSION //' > stagingCMakeVersion &&
             cat parakeet-qt-main/CMakeLists.txt | grep project\(.*VERSION.*\) | sed 's/ DESCRIPTION.*//' | sed 's/.*VERSION //' > mainCMakeVersion &&
-            echo '! cmp --silent stagingCMakeVersion mainCMakeVersion' | bash
+            (echo '! cmp --silent stagingCMakeVersion mainCMakeVersion' | bash)
             
       - name: Check CHANGELOG is different
         run:         
-            echo '! cmp --silent parakeet-qt/CHANGELOG.md parakeet-qt-main/CHANGELOG.md' | bash
+            (echo '! cmp --silent parakeet-qt/CHANGELOG.md parakeet-qt-main/CHANGELOG.md' | bash)
