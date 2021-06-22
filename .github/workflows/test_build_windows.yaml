@@ -9,8 +9,6 @@ env:
   PARAKEET_SDK_REPO: 'BryceVichiOJ/parakeet-sdk'
   PARAKEET_QT_REPO: 'BryceVichiOJ/parakeet-qt'
   PERSONAL_ACCESS_TOKEN: ${{ secrets.Parakeet_PART }}
-  mainVersion: "0"
-  prVersion: "0"
 
 jobs:
  build:
@@ -37,14 +35,26 @@ jobs:
           
       - name: Get Main Version
         run: 
-            echo "mainVersion=$(Select-String -Pattern 'project.*VERSION.*..*..*' parakeet-qt-main/CMakeLists.txt)" >> $env:GITHUB_ENV
+            echo "MAIN_VERSION=$(Select-String -Pattern 'project.*VERSION.*..*..*' parakeet-qt-main/CMakeLists.txt)" >> $env:GITHUB_ENV
             
       - name: Get PR Version
         run: 
-            echo "prVersion=$(Select-String -Pattern 'project.*VERSION.*..*..*' parakeet-qt/CMakeLists.txt)" >> $env:GITHUB_ENV
+            echo "PR_VERSION=$(Select-String -Pattern 'project.*VERSION.*..*..*' parakeet-qt/CMakeLists.txt)" >> $env:GITHUB_ENV
             
       - name: Fail due to same version
-        if: ${{ env.mainVersion == env.prVersion }}
+        if: ${{ env.MAIN_VERSION == env.PR_VERSION }}
+        run: exit 1
+        
+      - name: Get Main CHANGELOG
+        run: 
+            echo "MAIN_CHANGELOG=$(type 'project.*VERSION.*..*..*' parakeet-qt-main/CHANGELOG.md)" >> $env:GITHUB_ENV
+            
+      - name: Get PR CHANGELOG
+        run: 
+            echo "PR_CHANGELOG=$(type 'project.*VERSION.*..*..*' parakeet-qt/CHANGELOG.md)" >> $env:GITHUB_ENV
+            
+      - name: Fail due to same CHANGELOG
+        if: ${{ env.MAIN_CHANGELOG == prChangeLog.PR_CHANGELOG }}
         run: exit 1
 
       - name: Clone Parkeet SDK
