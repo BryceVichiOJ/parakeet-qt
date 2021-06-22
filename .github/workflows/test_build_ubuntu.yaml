@@ -36,23 +36,11 @@ jobs:
           
       - name: Get Main Version
         run: 
-            echo "mainVersion=$(grep 'project.*VERSION.*..*..*' parakeet-qt-main/CMakeLists.txt)" >> $GITHUB_ENV
+            echo "MAIN_VERSION=$(grep 'project.*VERSION.*..*..*' parakeet-qt-main/CMakeLists.txt)" >> $GITHUB_ENV
             
       - name: Get PR Version
         run: 
-            echo "prVersion=$(grep 'project.*VERSION.*..*..*' parakeet-qt/CMakeLists.txt)" >> $GITHUB_ENV
-            
-      - name: Fail due to same version
-        if: ${{ env.mainVersion == env.prVersion }}
-        run: exit 1
-        
-      - name: Get Main Version
-        run: 
-            echo "MAIN_VERSION=$(grep 'project.*VERSION.*..*..*' parakeet-qt-main/CMakeLists.txt)" >> $env:GITHUB_ENV
-            
-      - name: Get PR Version
-        run: 
-            echo "PR_VERSION=$(grep 'project.*VERSION.*..*..*' parakeet-qt/CMakeLists.txt)" >> $env:GITHUB_ENV
+            echo "PR_VERSION=$(grep 'project.*VERSION.*..*..*' parakeet-qt/CMakeLists.txt)" >> $GITHUB_ENV
             
       - name: Fail due to same version
         if: ${{ env.MAIN_VERSION == env.PR_VERSION }}
@@ -60,11 +48,11 @@ jobs:
         
       - name: Get Main CHANGELOG
         run: 
-            echo "MAIN_CHANGELOG=$(cat 'project.*VERSION.*..*..*' parakeet-qt-main/CHANGELOG.md)" >> $env:GITHUB_ENV
+            echo "MAIN_CHANGELOG=$(cat 'project.*VERSION.*..*..*' parakeet-qt-main/CHANGELOG.md)" >> $GITHUB_ENV
             
       - name: Get PR CHANGELOG
         run: 
-            echo "PR_CHANGELOG=$(cat 'project.*VERSION.*..*..*' parakeet-qt/CHANGELOG.md)" >> $env:GITHUB_ENV
+            echo "PR_CHANGELOG=$(cat 'project.*VERSION.*..*..*' parakeet-qt/CHANGELOG.md)" >> $GITHUB_ENV
             
       - name: Fail due to same CHANGELOG
         if: ${{ env.MAIN_CHANGELOG == env.PR_CHANGELOG }}
