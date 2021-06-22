@@ -67,7 +67,7 @@ jobs:
             echo "PR_CHANGELOG=$(cat 'project.*VERSION.*..*..*' parakeet-qt/CHANGELOG.md)" >> $env:GITHUB_ENV
             
       - name: Fail due to same CHANGELOG
-        if: ${{ env.MAIN_CHANGELOG == prChangeLog.PR_CHANGELOG }}
+        if: ${{ env.MAIN_CHANGELOG == env.PR_CHANGELOG }}
         run: exit 1
 
 
