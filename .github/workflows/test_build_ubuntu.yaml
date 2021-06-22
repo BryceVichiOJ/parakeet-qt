@@ -51,7 +51,7 @@ jobs:
             echo "CHANGELOG_DIFF=$(diff 'parakeet-qt-main/CHANGELOG.md' 'parakeet-qt/CHANGELOG.md')" >> $GITHUB_ENV
             
       - name: Fail due to same CHANGELOG
-        if: ${{ env.CHANGELOG_DIFF == " " }}
+        if: ${{ env.CHANGELOG_DIFF == '' }}
         run: exit 1
 
 
