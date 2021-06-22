@@ -36,11 +36,11 @@ jobs:
           
       - name: Get Main Version
         run: 
-            echo "mainVersion=$(grep 'project(' parakeet-qt-main/CMakeLists.txt)" >> $GITHUB_ENV
+            echo "mainVersion=$(grep 'project.*VERSION.*..*..*' parakeet-qt-main/CMakeLists.txt)" >> $GITHUB_ENV
             
       - name: Get PR Version
         run: 
-            echo "prVersion=$(grep 'project(' parakeet-qt/CMakeLists.txt)" >> $GITHUB_ENV
+            echo "prVersion=$(grep 'project.*VERSION.*..*..*' parakeet-qt/CMakeLists.txt)" >> $GITHUB_ENV
             
       - name: Compare Versions
         if: ${{ env.mainVersion == env.prVersion }}
