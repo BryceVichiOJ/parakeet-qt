@@ -50,7 +50,7 @@ jobs:
             echo "CHANGELOG_DIFF=$((Get-FileHash 'parakeet-qt-main/CHANGELOG.md').Hash -eq (Get-FileHash 'parakeet-qt/CHANGELOG.md').Hash)" >> $env:GITHUB_ENV
             
       - name: Fail due to same CHANGELOG
-        if: ${{ env.CHANGELOG_DIFF == 'False' }}
+        if: ${{ env.CHANGELOG_DIFF == 'True' }}
         run: exit 1
         
       - name: Clone Parkeet SDK
