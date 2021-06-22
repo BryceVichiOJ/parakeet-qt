@@ -9,6 +9,8 @@ env:
   PARAKEET_SDK_REPO: 'BryceVichiOJ/parakeet-sdk'
   PARAKEET_QT_REPO: 'BryceVichiOJ/parakeet-qt'
   PERSONAL_ACCESS_TOKEN: ${{ secrets.Parakeet_PART }}
+  mainVersion: "0"
+  prVersion: "0"
 
 jobs:
  build:
