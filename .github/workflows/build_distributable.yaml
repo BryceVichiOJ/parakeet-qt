@@ -58,15 +58,15 @@ jobs:
             cmake --build ${{github.workspace}}/parakeet-qt/build --config ${{env.BUILD_TYPE}}
         
       - name: Get New Parakeet Qt Release Version
+        if: ${{ matrix.os == "windows-2019" }}
         id: getversion
         run:             
-            cat parakeet-qt/CMakeLists.txt | grep project\\(.*VERSION.*\\) | sed 's/ DESCRIPTION.*//' | sed 's/.*VERSION //' > CMakeVersion
-            echo "::set-output name=version::$(cat CMakeVersion)"
-            echo ${{ steps.getversion.outputs.version }}
+            echo "UPDATE_VERSION=$(cat parakeet-qt/CMakeLists.txt | grep project\\(.*VERSION.*\\) | sed 's/ DESCRIPTION.*//' | sed 's/.*VERSION //' > CMakeVersion)" >> $GITHUB_ENV
+            
       - name: Create Release
-          uses: ncipollo/release-action@v1
-              with:
-                allowsUpdates: true
-                artifacts: "CMakeVersion"
-                tag: v${{ steps.getversion.outputs.version }}
-                token: ${{ secrets.GITHUB_TOKEN }}
+        uses: ncipollo/release-action@v1
+          with:
+            allowsUpdates: true
+            artifacts: ${{ env.UPDATE_VERSION }} 
+            tag: v${{ steps.getversion.outputs.version }}
+            token: ${{ secrets.GITHUB_TOKEN }}
