@@ -1,4 +1,4 @@
-name: Test-Build
+name: Test-Build-Ubuntu
 
 on:
   pull_request:
@@ -68,5 +68,5 @@ jobs:
             echo "prVersion=$(grep 'project(' parakeet-qt/CMakeLists.txt)" >> $GITHUB_ENV
             
       - name: Compare Versions
-            if: ${{ env.mainVersion == env.prVersion }}
-            run: exit 1
+        if: ${{ env.mainVersion == env.prVersion }}
+        run: exit 1

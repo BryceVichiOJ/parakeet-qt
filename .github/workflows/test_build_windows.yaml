@@ -1,4 +1,4 @@
-name: Test-Build
+name: Test-Build-Windows
 
 on:
   pull_request:
@@ -67,5 +67,5 @@ jobs:
             echo "prVersion=$(Select-String -Pattern 'project(' -SimpleMatch parakeet-qt/CMakeLists.txt)" >> $GITHUB_ENV
             
       - name: Compare Versions
-            if: ${{ env.mainVersion == env.prVersion }}
-            run: exit 1
+        if: ${{ env.mainVersion == env.prVersion }}
+        run: exit 1
