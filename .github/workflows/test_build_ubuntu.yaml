@@ -1,0 +1,72 @@
+name: Test-Build
+
+on:
+  pull_request:
+    branches: [ main ]
+
+env:
+  BUILD_TYPE: Release
+  PARAKEET_SDK_REPO: 'BryceVichiOJ/parakeet-sdk'
+  PARAKEET_QT_REPO: 'BryceVichiOJ/parakeet-qt'
+  PERSONAL_ACCESS_TOKEN: ${{ secrets.Parakeet_PART }}
+
+jobs:
+ build:
+   runs-on: ${{ matrix.os }}
+   strategy:
+     matrix:
+      include:
+       - os: ubuntu-18.04
+       - os: ubuntu-20.04
+   steps:
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2
+
+      - name: Clone Parkeet SDK
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.PARAKEET_SDK_REPO }}
+          path: 'parakeet-sdk'
+          token: ${{ env.PERSONAL_ACCESS_TOKEN || github.token }}
+
+      - name: Configure CMake for Parakeet SDK
+        run: 
+          cd parakeet-sdk &&
+          cmake -B ${{github.workspace}}/parakeet-sdk/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/parakeet-sdk/install
+
+      - name: Build for Parakeet SDK
+        run: 
+          cmake --build parakeet-sdk/build --config ${{env.BUILD_TYPE}} --target install &&
+          cd parakeet-sdk/build
+
+      - name: Clone Parkeet Qt
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.PARAKEET_QT_REPO }}
+          path: 'parakeet-qt'
+          token: ${{ env.PERSONAL_ACCESS_TOKEN || github.token }}
+          
+      - name: Clone Parkeet Qt Main Branch
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.PARAKEET_QT_REPO }}
+          path: 'parakeet-qt-main'
+          token: ${{ env.PERSONAL_ACCESS_TOKEN || github.token }}
+
+      - name: Configure CMake for Parakeet Qt
+        run:
+          cd parakeet-qt &&
+            cmake -B ${{github.workspace}}/parakeet-qt/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_PREFIX_PATH=${{github.workspace}}/parakeet-sdk/install &&
+            cd build
+
+      - name: Get Main Version
+        run: 
+            echo "mainVersion=$(grep 'project(' parakeet-qt-main/CMakeLists.txt)" >> $GITHUB_ENV
+            
+      - name: Get PR Version
+        run: 
+            echo "prVersion=$(grep 'project(' parakeet-qt/CMakeLists.txt)" >> $GITHUB_ENV
+            
+      - name: Compare Versions
+            if: ${{ env.mainVersion == env.prVersion }}
+            run: exit 1

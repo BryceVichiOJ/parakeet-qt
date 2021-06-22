@@ -16,8 +16,6 @@ jobs:
    strategy:
      matrix:
       include:
-       - os: ubuntu-18.04
-       - os: ubuntu-20.04
        - os: windows-2019
    steps:
       - name: Install Qt
@@ -61,14 +59,13 @@ jobs:
             cd build
 
       - name: Get Main Version
-        id: getversion
         run: 
-            echo "::set-output name=CMakeFile::$(cat parakeet-qt/CMakeLists.txt)" &&
-            echo "::set-output name=mainCMakeFile::$(cat parakeet-qt-main/CMakeLists.txt)"
+            echo "mainVersion=$(Select-String -Pattern 'project(' -SimpleMatch parakeet-qt-main/CMakeLists.txt)" >> $GITHUB_ENV
             
-      - uses: actions-ecosystem/action-regex-match@v2
-        id: regex-match
-        with:
-          text: ${{ steps.getversion.outputs.CMakeFile }}
-          regex: 'VERSION .\..\.. '
-      - run: echo ${{ steps.regex-match.outputs.group1 }}
+      - name: Get PR Version
+        run: 
+            echo "prVersion=$(Select-String -Pattern 'project(' -SimpleMatch parakeet-qt/CMakeLists.txt)" >> $GITHUB_ENV
+            
+      - name: Compare Versions
+            if: ${{ env.mainVersion == env.prVersion }}
+            run: exit 1
