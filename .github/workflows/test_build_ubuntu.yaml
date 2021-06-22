@@ -42,7 +42,7 @@ jobs:
         run: 
             echo "prVersion=$(grep 'project.*VERSION.*..*..*' parakeet-qt/CMakeLists.txt)" >> $GITHUB_ENV
             
-      - name: Compare Versions
+      - name: Fail due to same version
         if: ${{ env.mainVersion == env.prVersion }}
         run: exit 1
 
