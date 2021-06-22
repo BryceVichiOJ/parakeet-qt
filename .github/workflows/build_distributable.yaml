@@ -65,8 +65,8 @@ jobs:
             
       - name: Create Release
         uses: ncipollo/release-action@v1
-          with:
-            allowsUpdates: true
-            artifacts: ${{ env.UPDATE_VERSION }} 
-            tag: v${{ steps.getversion.outputs.version }}
-            token: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          allowsUpdates: true
+          artifacts: ${{ env.UPDATE_VERSION }} 
+          tag: v${{ steps.getversion.outputs.version }}
+          token: ${{ secrets.GITHUB_TOKEN }}
