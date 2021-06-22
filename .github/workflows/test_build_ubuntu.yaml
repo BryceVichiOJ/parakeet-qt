@@ -48,11 +48,11 @@ jobs:
         
       - name: Get Main CHANGELOG
         run: 
-            echo "MAIN_CHANGELOG=$(cat 'project.*VERSION.*..*..*' parakeet-qt-main/CHANGELOG.md)" >> $GITHUB_ENV
+            echo "MAIN_CHANGELOG=$(cat parakeet-qt-main/CHANGELOG.md)" >> $GITHUB_ENV
             
       - name: Get PR CHANGELOG
         run: 
-            echo "PR_CHANGELOG=$(cat 'project.*VERSION.*..*..*' parakeet-qt/CHANGELOG.md)" >> $GITHUB_ENV
+            echo "PR_CHANGELOG=$(cat parakeet-qt/CHANGELOG.md)" >> $GITHUB_ENV
             
       - name: Fail due to same CHANGELOG
         if: ${{ env.MAIN_CHANGELOG == env.PR_CHANGELOG }}
