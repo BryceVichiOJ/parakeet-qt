@@ -47,7 +47,7 @@ jobs:
         
       - name: Get CHANGELOG Difference state
         run: 
-            echo "CHANGELOG_DIFF=$((Get-FileHash 'parakeet-qt-main/CHANGELOG.md').Hash -eq (Get-FileHash 'parakeet-qt/CHANGELOG.md').Hash)" >> $GITHUB_ENV
+            echo "CHANGELOG_DIFF=$((Get-FileHash 'parakeet-qt-main/CHANGELOG.md').Hash -eq (Get-FileHash 'parakeet-qt/CHANGELOG.md').Hash)" >> $env:GITHUB_ENV
             
       - name: Fail due to same CHANGELOG
         if: ${{ env.CHANGELOG_DIFF == 'False' }}
