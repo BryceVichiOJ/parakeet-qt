@@ -45,18 +45,14 @@ jobs:
         if: ${{ env.MAIN_VERSION == env.PR_VERSION }}
         run: exit 1
         
-      - name: Get Main CHANGELOG
+      - name: Get CHANGELOG Difference state
         run: 
-            echo "MAIN_CHANGELOG=$(type parakeet-qt-main/CHANGELOG.md)" >> $env:GITHUB_ENV
-            
-      - name: Get PR CHANGELOG
-        run: 
-            echo "PR_CHANGELOG=$(type parakeet-qt/CHANGELOG.md)" >> $env:GITHUB_ENV
+            echo "CHANGELOG_DIFF=$((Get-FileHash 'parakeet-qt-main/CHANGELOG.md').Hash -eq (Get-FileHash 'parakeet-qt/CHANGELOG.md').Hash)" >> $GITHUB_ENV
             
       - name: Fail due to same CHANGELOG
-        if: ${{ env.MAIN_CHANGELOG == env.PR_CHANGELOG }}
+        if: ${{ env.CHANGELOG_DIFF == 'False' }}
         run: exit 1
-
+        
       - name: Clone Parkeet SDK
         uses: actions/checkout@v2
         with:

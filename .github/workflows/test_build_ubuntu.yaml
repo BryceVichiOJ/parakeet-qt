@@ -54,7 +54,6 @@ jobs:
         if: ${{ env.CHANGELOG_DIFF == '' }}
         run: exit 1
 
-
       - name: Clone Parkeet SDK
         uses: actions/checkout@v2
         with:
