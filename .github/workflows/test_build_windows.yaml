@@ -35,11 +35,11 @@ jobs:
           
       - name: Get Main Version
         run: 
-            echo "mainVersion=$(Select-String -Pattern 'project.*VERSION.*..*..*' 'parakeet-qt-main/CMakeLists.txt')" >> $GITHUB_ENV
+            echo "mainVersion=$(Select-String -Pattern 'project.*VERSION.*..*..*' parakeet-qt-main/CMakeLists.txt)" >> $GITHUB_ENV
             
       - name: Get PR Version
         run: 
-            echo "prVersion=$(Select-String -Pattern 'project.*VERSION.*..*..*' -SimpleMatch 'parakeet-qt/CMakeLists.txt')" >> $GITHUB_ENV
+            echo "prVersion=$(Select-String -Pattern 'project.*VERSION.*..*..*' parakeet-qt/CMakeLists.txt)" >> $GITHUB_ENV
             
       - name: Fail due to same version
         if: ${{ env.mainVersion == env.prVersion }}
