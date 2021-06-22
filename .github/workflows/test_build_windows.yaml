@@ -37,7 +37,7 @@ jobs:
           
       - name: Get Main Version
         run: 
-            echo "mainVersion=$(Select-String -Pattern 'project.*VERSION.*..*..*' parakeet-qt-main/CMakeLists.txt)" >> $GITHUB_ENV
+            echo "mainVersion=50" >> $GITHUB_ENV
             
       - name: Get PR Version
         run: 
