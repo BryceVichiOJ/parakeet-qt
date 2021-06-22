@@ -46,9 +46,9 @@ jobs:
         if: ${{ env.MAIN_VERSION == env.PR_VERSION }}
         run: exit 1
         
-      - name: Get Main CHANGELOG
+      - name: Get CHANGELOG Difference state
         run: 
-            echo "CHANGELOG_DIFF=$(diff 'parakeet-qt-main/CHANGELOG.md' 'parakeet-qt/CHANGELOG.md')" >> $GITHUB_ENV
+            echo "CHANGELOG_DIFF=$(diff -q 'parakeet-qt-main/CHANGELOG.md' 'parakeet-qt/CHANGELOG.md')" >> $GITHUB_ENV
             
       - name: Fail due to same CHANGELOG
         if: ${{ env.CHANGELOG_DIFF == '' }}
