@@ -1,0 +1,106 @@
+name: Build-Distributable
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  BUILD_TYPE: Release
+  PARAKEET_SDK_REPO: 'BryceVichiOJ/parakeet-sdk'
+  PARAKEET_QT_REPO: 'BryceVichiOJ/parakeet-qt'
+  PERSONAL_ACCESS_TOKEN: ${{ secrets.Parakeet_PART }}
+  
+
+jobs:
+ build:
+   runs-on: ${{ matrix.os }}
+   strategy:
+     matrix:
+      include:
+       - os: ubuntu-18.04
+         archive_format: tar.gz
+       - os: windows-2019
+         archive_format: zip
+   steps:
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2
+        with:
+          dir: ${{ github.workspace }}/Qt/
+          version: 5.15.2
+
+      - name: Clone Parkeet SDK
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.PARAKEET_SDK_REPO }}
+          path: 'parakeet-sdk'
+          token: ${{ env.PERSONAL_ACCESS_TOKEN || github.token }}
+
+      - name: Configure CMake for Parakeet SDK
+        run: cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/parakeet-sdk/install
+        working-directory: parakeet-sdk
+
+      - name: Build for Parakeet SDK
+        run: cmake --build build  --config ${{env.BUILD_TYPE}} --target install
+        working-directory: parakeet-sdk
+
+      - name: Clone Parkeet Qt
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.PARAKEET_QT_REPO }}
+          path: 'parakeet-qt'
+          token: ${{ env.PERSONAL_ACCESS_TOKEN || github.token }}
+
+      - name: Configure CMake for Parakeet Qt
+        run: cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_PREFIX_PATH=${{github.workspace}}/parakeet-sdk/install
+        working-directory: parakeet-qt
+
+      - name: Build Parakeet Qt
+        run: cmake --build build --config ${{env.BUILD_TYPE}}
+        working-directory: parakeet-qt
+        
+      - name: Get Version - Linux
+        if: runner.os == 'Linux'
+        run: echo "UPDATE_VERSION=$(cat parakeet-qt/CMakeLists.txt | grep project.*VERSION.*..*..* | sed 's/.*VERSION //' | sed 's/ .*//')" >> $GITHUB_ENV
+            
+      - name: Get Version - Windows
+        if: runner.os == 'Windows'
+        run: echo "UPDATE_VERSION=$([regex]::matches((type parakeet-qt/CMakeLists.txt | Select-String 'project.*VERSION.*..*..*'), '\d+.\d+.\d+').value)" >> $env:GITHUB_ENV
+      
+      - name: Setup linuxdeployqt - Linux
+        if: runner.os == 'Linux'
+        run: |
+            mkdir linuxdeployqt
+            cd linuxdeployqt
+            sudo apt install libxcb-*
+            wget https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
+            chmod +x linuxdeployqt-continuous-x86_64.AppImage
+        
+      - name: Create Distributable
+        if: runner.os == 'Linux'
+        env:
+            RELEASE_NAME: parakeet-qt-${{env.UPDATE_VERSION}}-x64-Ubuntu-18.04-20.04
+        run: |
+            mkdir ${{ env.RELEASE_NAME }}
+            cp parakeet-qt/build/parakeet-viewer ${{ env.RELEASE_NAME }}/parakeet-viewer
+            ./linuxdeployqt/linuxdeployqt-continuous-x86_64.AppImage ${{ env.RELEASE_NAME }}/parakeet-viewer -verbose=2
+            rm ${{ env.RELEASE_NAME }}/AppRun
+            tar -czf ${{ env.RELEASE_NAME }}.${{ matrix.archive_format }} ${{ env.RELEASE_NAME }}
+        
+      - name: Create Distributable - Windows
+        if: runner.os == 'Windows'
+        env:
+            RELEASE_NAME: parakeet-qt-${{env.UPDATE_VERSION}}-x64-Windows
+        run: |
+            mkdir ${{ env.RELEASE_NAME }}
+            cp parakeet-qt/build/${{env.BUILD_TYPE}}/parakeet-viewer.exe ${{ env.RELEASE_NAME }}/parakeet-viewer.exe
+            ${{ env. Qt5_Dir }}/bin/windeployqt.exe ${{ env.RELEASE_NAME }}/parakeet-viewer.exe
+            Compress-Archive -Path ${{ env.RELEASE_NAME }} -DestinationPath ${{ env.RELEASE_NAME }}.${{ matrix.archive_format }}
+        
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: parakeet-qt-*.${{ matrix.archive_format }}
+          body: Automatic binary creation for Parakeet-Qt v${{ env.UPDATE_VERSION }}. Check CHANGELOG.md for changes.
+          tag: v${{ env.UPDATE_VERSION }}
+          token: ${{ secrets.GITHUB_TOKEN }}
