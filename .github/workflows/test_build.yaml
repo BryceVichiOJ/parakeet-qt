@@ -1,0 +1,103 @@
+name: Test-Build
+
+on:
+  pull_request:
+    branches: [ main ]
+
+env:
+  BUILD_TYPE: Release
+  PARAKEET_SDK_REPO: 'BryceVichiOJ/parakeet-sdk'
+  PARAKEET_QT_REPO: 'BryceVichiOJ/parakeet-qt'
+  PERSONAL_ACCESS_TOKEN: ${{ secrets.Parakeet_PART }}
+
+jobs:
+ build:
+   runs-on: ${{ matrix.os }}
+   strategy:
+     matrix:
+      include:
+       - os: ubuntu-18.04
+       - os: ubuntu-20.04
+       - os: windows-2019
+   steps:
+      - name: Clone Parkeet Qt
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.PARAKEET_QT_REPO }}
+          path: 'parakeet-qt'
+          token: ${{ env.PERSONAL_ACCESS_TOKEN || github.token }}
+          
+      - name: Clone Parkeet Qt Main Branch
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.PARAKEET_QT_REPO }}
+          ref: main
+          path: 'parakeet-qt-main'
+          token: ${{ env.PERSONAL_ACCESS_TOKEN || github.token }}
+          
+      - name: Get Main Version - Windows
+        if: runner.os == 'Windows'
+        run: echo "MAIN_VERSION=$(Select-String -Pattern 'project.*VERSION.*..*..*' parakeet-qt-main/CMakeLists.txt)" >> $env:GITHUB_ENV
+        
+      - name: Get Main Version - Linux
+        if: runner.os == 'Linux'
+        run: echo "MAIN_VERSION=$(grep 'project.*VERSION.*..*..*' parakeet-qt-main/CMakeLists.txt)" >> $GITHUB_ENV
+            
+      - name: Get PR Version - Windows
+        if: runner.os == 'Windows'
+        run: echo "PR_VERSION=$(Select-String -Pattern 'project.*VERSION.*..*..*' parakeet-qt/CMakeLists.txt)" >> $env:GITHUB_ENV
+        
+      - name: Get PR Version - Linux
+        if: runner.os == 'Linux'
+        run: echo "PR_VERSION=$(grep 'project.*VERSION.*..*..*' parakeet-qt/CMakeLists.txt)" >> $GITHUB_ENV
+            
+      - name: Fail due to same version
+        if: ${{ env.MAIN_VERSION == env.PR_VERSION }}
+        run: exit 1
+        
+      - name: Get CHANGELOG Difference state - Windows
+        if: runner.os == 'Windows'
+        run: echo "CHANGELOG_DIFF=$((Get-FileHash 'parakeet-qt-main/CHANGELOG.md').Hash -eq (Get-FileHash 'parakeet-qt/CHANGELOG.md').Hash)" >> $env:GITHUB_ENV
+        
+      - name: Get CHANGELOG Difference state - Linux
+        if: runner.os == 'Linux'
+        run: echo "CHANGELOG_DIFF=$(diff -q 'parakeet-qt-main/CHANGELOG.md' 'parakeet-qt/CHANGELOG.md')" >> $GITHUB_ENV
+            
+      - name: Fail due to same CHANGELOG - Windows
+        if: runner.os == 'Windows' && env.CHANGELOG_DIFF == 'True'
+        run: exit 1
+            
+      - name: Fail due to same CHANGELOG - Linux
+        if: runner.os == 'Linux' && env.CHANGELOG_DIFF == ''
+        run: exit 1
+            
+      - name: Clone Parkeet SDK
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.PARAKEET_SDK_REPO }}
+          path: 'parakeet-sdk'
+          token: ${{ env.PERSONAL_ACCESS_TOKEN || github.token }}
+
+      - name: Configure CMake for Parakeet SDK
+        run: |
+            mkdir build
+            mkdir install
+            cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/parakeet-sdk/install
+        working-directory: parakeet-sdk
+
+      - name: Build for Parakeet SDK
+        run: cmake --build build  --config ${{env.BUILD_TYPE}} --target install
+        working-directory: parakeet-sdk
+          
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2.13.2
+        
+      - name: Configure CMake for Parakeet Qt
+        run: |
+            mkdir build
+            cmake -B build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_PREFIX_PATH=${{github.workspace}}/parakeet-sdk/install
+        working-directory: parakeet-qt
+
+      - name: Build Parakeet Qt
+        run: cmake --build build --config ${{env.BUILD_TYPE}}
+        working-directory: parakeet-qt
